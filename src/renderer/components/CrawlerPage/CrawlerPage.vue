@@ -1,8 +1,9 @@
 <template>
   <div id="wrapper">
     <div class="doc">
-      <button style="float:right" class="alt" @click="startCrawl()">Start</button>
       <router-link to="/">Back</router-link>
+      <button style="float:right" class="alt" @click="startCrawl()">Start</button>
+      <button style="float:right" class="alt" @click="viewScheduler()">View scheduler dashboard</button>
       <br /> <br>
       <div> 
         <span>Extract URLs</span>
@@ -16,66 +17,29 @@
 
 <script>
   const Crawler = require("crawler");
-  import DbConnection from '../../db/connection';
-  import Item from '../../db/models/item';
-  import JQuery from 'jquery'
-  let $ = JQuery
+  import Scheduler from '../../scheduler/scheduler'
+  import CrawlerService from '../../common/crawler.service'
 
   export default {
     data () {
       return {
         db: {},
+        scheduler: {},
         extractUrls: `https://www.amazon.com/dp/B00N0IHMXM, https://www.amazon.com/dp/B009FUF6DM`,
         crawlUrls: [],
-        count: 0
       }
     },
     created () {
-      this.db = new DbConnection();
-      this.db.connect("mongodb://localhost:27017/scraper");
+      this.scheduler = new Scheduler();
     },
     methods: {
-      initCrawler() {
-        return new Crawler({
-          rateLimit: 1000,
-          callback: (err, res, done) => {
-            if(err) {
-              console.log(err);
-            } else {
-              var $ = res.$;
-              var item = new Item();
-
-              var totalReview = $(".totalReviewCount").text().trim();
-              item.totalReview = Number(totalReview.replace(/,/g, '.'));
-
-              item.productTitle = $("#productTitle").text().trim();
-              item.rating = $("#acrPopover").attr("title");
-              item.price = $("#priceblock_ourprice").text().trim();
-              item.asin = $("#ASIN").val();
-
-              $('[data-hook=recent-review]').each((i, element) => {
-                var review = {};
-
-                review.reviewer = $(element).find('.a-profile-name').text().trim();
-                review.rating = $(element).find('.a-icon-alt').text().trim();
-                review.title = $(element).find('[data-hook=review-title-recent]').text().trim();
-                review.content = $(element).find('[data-hook=review-body-recent]').text().trim();
-
-                item.recentReviews.push(review);
-              });
-
-              this.db.findOneAndUpdate(item);
-            }
-            done();
-          }
-        });
+      viewScheduler() {
+        var shell = require('electron').shell;
+                         event.preventDefault();
+                          shell.openExternal('http://localhost:3000/');
       },
-      startCrawl(urls) {
-        var c = this.initCrawler();
-        var urls = this.extractUrls.split(",");
-        if(urls.length > 0) {
-          c.queue(urls);
-        }
+      startCrawl() {
+        this.scheduler.runEveryMinute(this.extractUrls);
       }
     }
   }

@@ -10,7 +10,7 @@
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
-    "dev": "node .electron-vue/dev-runner.js",
+    "dev": "concurrently --kill-others \"npx agendash --db=mongodb://localhost:27017/agendaDb --collection=agendaCollection\" \"node .electron-vue/dev-runner.js\"",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
@@ -51,6 +51,8 @@
     }
   },
   "dependencies": {
+    "agenda": "^2.0.2",
+    "agendash": "^0.4.0",
     "axios": "^0.18.0",
     "crawler": "^1.2.0",
     "jquery": "^3.3.1",
@@ -71,6 +73,7 @@
     "babili-webpack-plugin": "^0.1.2",
     "cfonts": "^2.1.2",
     "chalk": "^2.4.1",
+    "concurrently": "^4.0.1",
     "copy-webpack-plugin": "^4.5.1",
     "cross-env": "^5.1.6",
     "css-loader": "^0.28.11",

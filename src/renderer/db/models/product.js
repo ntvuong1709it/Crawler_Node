@@ -17,7 +17,9 @@ var productSchema = new Schema({
     max_price: Number,
     min_3p_price: Number,
     max_3p_price: Number,
-    seller: String
+    seller: String,
+    createdTimeOnUtc: Date,
+    modifiedTimeOnUtc: Date
 });
 
 export default mongoose.model('product', productSchema);

@@ -1,9 +1,12 @@
 var mongoose = require('mongoose');
 import Item from '../db/models/item';
+import { DB } from '../common/config';
 
 class DbConnection {
-    connect(url) {
-        mongoose.connect(url, { useNewUrlParser: true });
+    url = DB.DB_URL;
+
+    connect() {
+        mongoose.connect(this.url, { useNewUrlParser: true });
         mongoose.set('useFindAndModify', false);
     }
     save(item) {
@@ -15,6 +18,8 @@ class DbConnection {
         itemModel.price = item.price;
         itemModel.asin = item.asin;
         itemModel.recentReviews = item.recentReviews;
+        itemModel.createdTimeOnUtc = item.createdTimeOnUtc;
+        itemModel.modifiedTimeOnUtc = item.modifiedTimeOnUtc;
 
         itemModel.save();
     }
@@ -23,7 +28,9 @@ class DbConnection {
 
         var itemToUpdate = {};
         itemToUpdate = Object.assign(itemToUpdate, item._doc);
+        itemToUpdate.modifiedTimeOnUtc = new Date().toUTCString()
         delete itemToUpdate._id;
+
         console.log(itemToUpdate)
         
         Item.findOneAndUpdate(query, itemToUpdate, (err, doc) => {
@@ -34,6 +41,7 @@ class DbConnection {
                 
             if(!doc) {
                 console.log('Item does not existed. Create new record')
+                itemToUpdate.createdTimeOnUtc = new Date().toUTCString()
                 this.save(itemToUpdate);
             }
 

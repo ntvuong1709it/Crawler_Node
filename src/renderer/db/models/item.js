@@ -7,7 +7,9 @@ var itemSchema = new Schema({
     rating: String,
     totalReview: Number,
     price: String,
-    recentReviews: Array
+    recentReviews: Array,
+    createdTimeOnUtc: String,
+    modifiedTimeOnUtc: String
 });
 
 export default mongoose.model('Item', itemSchema);
