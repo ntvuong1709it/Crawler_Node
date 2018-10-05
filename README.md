@@ -1,6 +1,11 @@
 # crawler
 
-> An electron-vue project
+> A crawler runs to collect data from Amazon
+
+#### Installation
+- Mongodb
+- Nodejs
+- Npm
 
 #### Build Setup
 
